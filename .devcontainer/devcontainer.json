@@ -1,0 +1,11 @@
+{
+    "name": "Golang Dev Container",
+    "dockerFile": "Dockerfile",
+    "appPort": 8080,
+    "extensions": [
+        "golang.Go"
+    ],
+    "settings": {
+        "go.useLanguageServer": true
+    }
+}
