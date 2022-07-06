@@ -1,11 +1,15 @@
 {
-    "name": "Golang Dev Container",
-    "dockerFile": "Dockerfile",
-    "appPort": 8080,
-    "extensions": [
-        "golang.Go"
-    ],
-    "settings": {
+	"name": "Golang Dev Container",
+	"dockerComposeFile": "stack.yml",
+	"service": "api",
+	"workspaceFolder": "/workspace",
+	"settings": {
         "go.useLanguageServer": true
-    }
+    },
+    "forwardPorts": [
+        "8080:8080"
+    ],
+	"extensions": [
+		"golang.Go"
+	]
 }
