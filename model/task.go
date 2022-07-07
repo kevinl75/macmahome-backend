@@ -48,27 +48,31 @@ func (t *Task) CreateTask() error {
 func (t *Task) UpdateTask() error {
 
 	dbConn := utils.NewDBConnection()
+	tx := dbConn.Begin()
 
 	var result *gorm.DB
 
 	if t.ProjectId == 0 {
-		result = dbConn.Omit("ProjectId").Save(&t)
+		result = tx.Debug().Omit("ProjectId").Updates(&t)
 	} else {
-		result = dbConn.Save(&t)
+		result = tx.Debug().Updates(&t)
 	}
 
-	if result.RowsAffected == 0 {
+	if result.Error != nil {
 		log.Print("update failed")
-		return errors.New("select failed")
+		tx.Rollback()
+		return result.Error
 	}
 
-	result = dbConn.First(&t)
+	result = tx.First(&t)
 
-	if result.RowsAffected == 0 {
-		log.Print("select failed")
-		return errors.New("select failed")
+	if result.Error != nil {
+		log.Print("update failed")
+		tx.Rollback()
+		return result.Error
 	}
 
+	tx.Commit()
 	return nil
 }
 
@@ -85,18 +89,17 @@ func (t Task) DeleteTask() error {
 	return nil
 }
 
-func ReturnTask(id string) (Task, error) {
+func ReturnTask(id string) Task {
 
 	var task Task
 	dbConn := utils.NewDBConnection()
 	result := dbConn.First(&task, id)
 
 	if result.RowsAffected == 0 {
-		log.Print("select failed")
-		return Task{}, errors.New("select failed")
+		return Task{}
 	}
 
-	return task, nil
+	return task
 }
 
 func ReturnTasks() ([]Task, error) {
