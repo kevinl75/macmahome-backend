@@ -14,8 +14,8 @@ type Task struct {
 	TaskId         uint      `gorm:"primaryKey" json:"task_id"`
 	TaskName       string    `json:"task_name"`
 	TaskIsComplete bool      `json:"task_is_complete"`
-	TaskDuration   int       `json:"task_duration"`
-	TaskDate       time.Time `json:"task_date" time_format:"2006-01-02"`
+	TaskDuration   uint      `json:"task_duration"`
+	TaskDate       time.Time `json:"task_date"`
 	ProjectId      uint      `json:"project_id"`
 }
 
@@ -30,16 +30,14 @@ func (t *Task) CreateTask() error {
 		result = dbConn.Create(&t)
 	}
 
-	if result.RowsAffected == 0 {
-		log.Print("Insertion Failed")
-		return errors.New("insertion failed")
+	if result.Error != nil {
+		return result.Error
 	}
 
 	result = dbConn.First(&t)
 
-	if result.RowsAffected == 0 {
-		log.Print("select failed")
-		return errors.New("select failed")
+	if result.Error != nil {
+		return result.Error
 	}
 
 	return nil

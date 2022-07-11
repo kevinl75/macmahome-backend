@@ -22,10 +22,11 @@ import (
 // returns the current testing context
 type TaskRouteAPITests struct {
 	suite.Suite
-	TestDbConn  *gorm.DB
-	TaskItems   []model.Task
-	TestingDate time.Time
-	TestRouter  *gin.Engine
+	TestDbConn       *gorm.DB
+	TaskItems        []model.Task
+	TestingDate      time.Time
+	TestRouter       *gin.Engine
+	FakeJSONTaskItem string
 }
 
 // before all the suite
@@ -47,6 +48,7 @@ func (suite *TaskRouteAPITests) SetupSuite() {
 		{TaskId: 2, TaskName: "Test 2", TaskIsComplete: true, TaskDuration: 90, TaskDate: suite.TestingDate},
 		{TaskId: 3, TaskName: "Test 3", TaskIsComplete: false, TaskDuration: 120, TaskDate: suite.TestingDate},
 	}
+	suite.FakeJSONTaskItem = "{\"task_id\": 12,\"task_name\": 456}"
 
 	dbConn.Create(&suite.TaskItems[0])
 	dbConn.Create(&suite.TaskItems[1])
@@ -83,6 +85,9 @@ func (suite *TaskRouteAPITests) TestPostRoute() {
 
 	assert.Equal(suite.T(), 500, w.Code)
 	suite.TestDbConn.Delete(&task)
+
+	w = ServeTestHTTPRequest("POST", "/task", bytes.NewBufferString(suite.FakeJSONTaskItem), suite.TestRouter)
+	assert.Equal(suite.T(), 400, w.Code)
 }
 
 func (suite *TaskRouteAPITests) TestGetRoute() {

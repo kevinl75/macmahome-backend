@@ -1,35 +1,28 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kevinl75/macmahome-backend/model"
 )
 
-func postTask(c *gin.Context) {
-	loggeur := log.Default()
+func createTask(c *gin.Context) {
 	var newTask model.Task
 
-	if err := c.BindJSON(&newTask); err != nil {
-		fmt.Println(err)
+	if err := c.ShouldBindJSON(&newTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := newTask.CreateTask()
 
 	if err != nil {
-		loggeur.Printf("an error occured during the insertion.")
-		msg, _ := json.Marshal(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, msg)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	loggeur.Printf("everything went well.")
-	c.IndentedJSON(http.StatusCreated, newTask)
+	c.JSON(http.StatusCreated, newTask)
 }
 
 func returnTask(c *gin.Context) {
