@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/kevinl75/macmahome-backend/utils"
@@ -80,10 +79,9 @@ func (t *Task) UpdateTask() error {
 func (t Task) DeleteTask() error {
 	dbConn := utils.NewDBConnection()
 
-	result := dbConn.Unscoped().Delete(&t)
+	result := dbConn.Delete(&t)
 
-	if result.RowsAffected == 0 {
-		log.Print("delete failed")
+	if result.Error != nil {
 		return result.Error
 	}
 

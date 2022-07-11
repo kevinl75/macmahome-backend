@@ -12,6 +12,7 @@ type Project struct {
 	ProjectName        string `json:"project_name"`
 	ProjectDescription string `json:"project_description"`
 	Tasks              []Task `json:"project_tasks"`
+	Notes              []Note `json:"project_notes"`
 }
 
 func (p *Project) CreateProject() error {
@@ -65,9 +66,9 @@ func (p *Project) UpdateProject() error {
 func (p Project) DeleteProject() error {
 	dbConn := utils.NewDBConnection()
 
-	result := dbConn.Unscoped().Delete(&p)
+	result := dbConn.Delete(&p)
 
-	if result.RowsAffected == 0 {
+	if result.Error != nil {
 		return result.Error
 	}
 
@@ -89,6 +90,11 @@ func (p Project) IsEqual(p2 Project) bool {
 			return false
 		}
 	}
+	for id, note := range p.Notes {
+		if note != p2.Notes[id] {
+			return false
+		}
+	}
 	return true
 }
 
@@ -96,7 +102,7 @@ func ReturnProject(id uint) (Project, error) {
 
 	var project Project
 	dbConn := utils.NewDBConnection()
-	result := dbConn.Preload("Tasks").First(&project, id)
+	result := dbConn.Preload("Tasks").Preload("Notes").First(&project, id)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -112,7 +118,7 @@ func ReturnProjects() ([]Project, error) {
 
 	var projects []Project
 	dbConn := utils.NewDBConnection()
-	result := dbConn.Preload("Tasks").Find(&projects)
+	result := dbConn.Preload("Tasks").Preload("Notes").Find(&projects)
 
 	if result.Error != nil {
 		return []Project{}, result.Error
