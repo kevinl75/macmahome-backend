@@ -100,15 +100,14 @@ func (suite *TaskRouteAPITests) TestGetRoute() {
 	assert.Equal(suite.T(), task, suite.TaskItems[0])
 
 	w = ServeTestHTTPRequest("GET", "/task/4", nil, suite.TestRouter)
-
 	assert.Equal(suite.T(), 404, w.Code)
 
+	w = ServeTestHTTPRequest("GET", "/task/test", nil, suite.TestRouter)
+	assert.Equal(suite.T(), 400, w.Code)
+
 	var tasks []model.Task
-
 	w = ServeTestHTTPRequest("GET", "/task", nil, suite.TestRouter)
-
 	json.Unmarshal(w.Body.Bytes(), &tasks)
-
 	assert.Equal(suite.T(), 2, len(tasks))
 }
 
@@ -124,8 +123,10 @@ func (suite *TaskRouteAPITests) TestDeleteRoute() {
 	suite.TestDbConn.Create(&task)
 
 	w = ServeTestHTTPRequest("DELETE", "/task/4", nil, suite.TestRouter)
-
 	assert.Equal(suite.T(), 404, w.Code)
+
+	w = ServeTestHTTPRequest("DELETE", "/task/test", nil, suite.TestRouter)
+	assert.Equal(suite.T(), 400, w.Code)
 }
 
 func (suite *TaskRouteAPITests) TestPatchRoute() {
@@ -149,6 +150,9 @@ func (suite *TaskRouteAPITests) TestPatchRoute() {
 	postRequestData, _ = json.Marshal(suite.TaskItems[2])
 	w = ServeTestHTTPRequest("PATCH", "/task", bytes.NewBuffer(postRequestData), suite.TestRouter)
 
-	assert.Equal(suite.T(), 500, w.Code)
+	assert.Equal(suite.T(), 404, w.Code)
 	suite.TestDbConn.Save(&task)
+
+	w = ServeTestHTTPRequest("PATCH", "/task", bytes.NewBufferString(suite.FakeJSONTaskItem), suite.TestRouter)
+	assert.Equal(suite.T(), 400, w.Code)
 }

@@ -1,10 +1,14 @@
 package api
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kevinl75/macmahome-backend/model"
+	"gorm.io/gorm"
 )
 
 func createTask(c *gin.Context) {
@@ -26,15 +30,27 @@ func createTask(c *gin.Context) {
 }
 
 func returnTask(c *gin.Context) {
-	id := c.Param("id")
 
-	task := model.ReturnTask(id)
-
-	if (task == model.Task{}) {
-		c.AbortWithStatus(http.StatusNotFound)
+	rawId := c.Param("id")
+	id, err := strconv.ParseUint(rawId, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.IndentedJSON(http.StatusOK, task)
+	task, err := model.ReturnTask(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if (task == model.Task{}) {
+		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
+		return
+	}
+
+	c.JSON(http.StatusOK, task)
 }
 
 func returnTasks(c *gin.Context) {
@@ -42,37 +58,56 @@ func returnTasks(c *gin.Context) {
 	tasks, err := model.ReturnTasks()
 
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.IndentedJSON(http.StatusOK, tasks)
+	c.JSON(http.StatusOK, tasks)
 }
 
 func updateTask(c *gin.Context) {
 	var updatedTask model.Task
 
-	if err := c.BindJSON(&updatedTask); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+	if err := c.ShouldBindJSON(&updatedTask); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := updatedTask.UpdateTask()
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			errorMsg := fmt.Errorf("no task entity with id %d", updatedTask.TaskId).Error()
+			c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.IndentedJSON(http.StatusOK, updatedTask)
+	c.JSON(http.StatusOK, updatedTask)
 }
 
 func deleteTask(c *gin.Context) {
-	id := c.Param("id")
+	rawId := c.Param("id")
+	id, err := strconv.ParseUint(rawId, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-	taskToDelete := model.ReturnTask(id)
+	taskToDelete, err := model.ReturnTask(uint(id))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	if (taskToDelete == model.Task{}) {
-		c.AbortWithStatus(http.StatusNotFound)
-	} else {
-		taskToDelete.DeleteTask()
-		c.IndentedJSON(http.StatusOK, taskToDelete)
+		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
+		return
 	}
+
+	taskToDelete.DeleteTask()
+	c.JSON(http.StatusOK, taskToDelete)
 }
