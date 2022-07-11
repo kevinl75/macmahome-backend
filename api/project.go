@@ -11,25 +11,25 @@ import (
 	"gorm.io/gorm"
 )
 
-func createTask(c *gin.Context) {
-	var newTask model.Task
+func createProject(c *gin.Context) {
+	var newProject model.Project
 
-	if err := c.ShouldBindJSON(&newTask); err != nil {
+	if err := c.ShouldBindJSON(&newProject); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := newTask.CreateTask()
+	err := newProject.CreateProject()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, newTask)
+	c.JSON(http.StatusCreated, newProject)
 }
 
-func returnTask(c *gin.Context) {
+func returnProject(c *gin.Context) {
 
 	rawId := c.Param("id")
 	id, err := strconv.ParseUint(rawId, 10, 32)
@@ -38,63 +38,45 @@ func returnTask(c *gin.Context) {
 		return
 	}
 
-	task, err := model.ReturnTask(uint(id))
+	project, err := model.ReturnProject(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if (task == model.Task{}) {
-		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+	if project.IsEqual(model.Project{}) {
+		errorMsg := fmt.Errorf("no project entity with id %d", id).Error()
 		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
 		return
 	}
 
-	c.JSON(http.StatusOK, task)
+	c.JSON(http.StatusOK, project)
 }
 
-func returnTasks(c *gin.Context) {
+func returnProjects(c *gin.Context) {
 
-	tasks, err := model.ReturnTasks()
+	projects, err := model.ReturnProjects()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, tasks)
+	c.JSON(http.StatusOK, projects)
 }
 
-func returnTasksByProjectId(c *gin.Context) {
-	rawId := c.Param("id")
-	id, err := strconv.ParseUint(rawId, 10, 32)
-	if err != nil {
+func updateProject(c *gin.Context) {
+	var updatedProject model.Project
+
+	if err := c.ShouldBindJSON(&updatedProject); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	tasks, err := model.ReturnTasksByProjectId(uint(id))
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, tasks)
-}
-
-func updateTask(c *gin.Context) {
-	var updatedTask model.Task
-
-	if err := c.ShouldBindJSON(&updatedTask); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := updatedTask.UpdateTask()
+	err := updatedProject.UpdateProject()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			errorMsg := fmt.Errorf("no task entity with id %d", updatedTask.TaskId).Error()
+			errorMsg := fmt.Errorf("no project entity with id %d", updatedProject.ProjectId).Error()
 			c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
 			return
 		}
@@ -102,10 +84,10 @@ func updateTask(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedTask)
+	c.JSON(http.StatusOK, updatedProject)
 }
 
-func deleteTask(c *gin.Context) {
+func deleteProject(c *gin.Context) {
 	rawId := c.Param("id")
 	id, err := strconv.ParseUint(rawId, 10, 32)
 	if err != nil {
@@ -113,19 +95,19 @@ func deleteTask(c *gin.Context) {
 		return
 	}
 
-	taskToDelete, err := model.ReturnTask(uint(id))
+	projectToDelete, err := model.ReturnProject(uint(id))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if (taskToDelete == model.Task{}) {
-		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+	if projectToDelete.IsEqual(model.Project{}) {
+		errorMsg := fmt.Errorf("no project entity with id %d", id).Error()
 		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
 		return
 	}
 
-	taskToDelete.DeleteTask()
-	c.JSON(http.StatusOK, taskToDelete)
+	projectToDelete.DeleteProject()
+	c.JSON(http.StatusOK, projectToDelete)
 }

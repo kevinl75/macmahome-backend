@@ -118,3 +118,15 @@ func ReturnTasks() ([]Task, error) {
 
 	return tasks, nil
 }
+
+func ReturnTasksByProjectId(projectId uint) ([]Task, error) {
+	var tasks []Task
+	dbConn := utils.NewDBConnection()
+	result := dbConn.Where("project_id = ?", projectId).Find(&tasks)
+
+	if result.Error != nil {
+		return []Task{}, result.Error
+	}
+
+	return tasks, nil
+}

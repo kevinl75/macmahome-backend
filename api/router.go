@@ -18,5 +18,12 @@ func NewRouter() *gin.Engine {
 	router.PATCH("/task", updateTask)
 	router.DELETE("/task/:id", deleteTask)
 
+	router.GET("/project/:id", returnProject)
+	router.GET("/project", returnProjects)
+	router.GET("/project/:id/task", returnTasksByProjectId)
+	router.POST("/project", createProject)
+	router.PATCH("/project", updateProject)
+	router.DELETE("/project/:id", deleteProject)
+
 	return router
 }
