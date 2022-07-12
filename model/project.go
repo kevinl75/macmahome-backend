@@ -5,6 +5,7 @@ import (
 
 	"github.com/kevinl75/macmahome-backend/utils"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Project struct {
@@ -21,7 +22,7 @@ func (p *Project) CreateProject() error {
 	tx := dbConn.Begin()
 
 	var result *gorm.DB
-	result = tx.Create(&p)
+	result = tx.Omit(clause.Associations).Create(&p)
 
 	if result.Error != nil {
 		tx.Rollback()
@@ -83,6 +84,12 @@ func (p Project) IsEqual(p2 Project) bool {
 		return false
 	}
 	if p.ProjectDescription != p2.ProjectDescription {
+		return false
+	}
+	if len(p.Tasks) != len(p2.Tasks) {
+		return false
+	}
+	if len(p.Notes) != len(p2.Notes) {
 		return false
 	}
 	for id, task := range p.Tasks {

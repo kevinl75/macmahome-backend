@@ -44,6 +44,12 @@ func returnNote(c *gin.Context) {
 		return
 	}
 
+	if (note == model.Note{}) {
+		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
+		return
+	}
+
 	c.JSON(http.StatusOK, note)
 }
 
@@ -111,6 +117,12 @@ func deleteNote(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if (noteToDelete == model.Note{}) {
+		errorMsg := fmt.Errorf("no task entity with id %d", id).Error()
+		c.JSON(http.StatusNotFound, gin.H{"error": errorMsg})
 		return
 	}
 

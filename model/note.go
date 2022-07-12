@@ -23,6 +23,7 @@ func (n *Note) CreateNote() error {
 	tx := dbConn.Begin()
 
 	var result *gorm.DB
+	fmt.Print(n)
 	if n.ProjectId == 0 {
 		result = tx.Omit("ProjectId").Create(&n)
 	} else {
