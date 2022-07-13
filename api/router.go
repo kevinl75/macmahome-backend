@@ -8,7 +8,7 @@ func NewRouter() *gin.Engine {
 
 	router.GET("/service-status", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "OK",
+			"message":  "OK",
 		})
 	})
 

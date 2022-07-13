@@ -43,3 +43,4 @@ require (
 	gorm.io/driver/sqlite v1.3.6 // indirect
 	gorm.io/gorm v1.23.7 // indirect
 )
+
