@@ -12,7 +12,7 @@ package main
 // @accept json
 // @produce json
 
-// @host localhost:8081
+// @host localhost:8080
 // @BasePath /
 import (
 	"github.com/kevinl75/macmahome-backend/api"

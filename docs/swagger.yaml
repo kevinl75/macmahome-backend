@@ -413,6 +413,21 @@ paths:
       summary: GET /project/:id/task
       tags:
       - task
+  /service-status:
+    get:
+      description: Simple route to determine if the service is up or not.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: GET /service-status
+      tags:
+      - admin
   /task:
     get:
       consumes:

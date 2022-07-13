@@ -546,6 +546,29 @@
                 }
             }
         },
+        "/service-status": {
+            "get": {
+                "description": "Simple route to determine if the service is up or not.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "GET /service-status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/task": {
             "get": {
                 "description": "Permit to return all the Task entities.",
