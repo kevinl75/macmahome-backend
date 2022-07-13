@@ -1,0 +1,583 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  model.Note:
+    properties:
+      note_content:
+        type: string
+      note_date:
+        type: string
+      note_id:
+        type: integer
+      note_name:
+        type: string
+      project_id:
+        type: integer
+    type: object
+  model.Project:
+    properties:
+      project_description:
+        type: string
+      project_id:
+        type: integer
+      project_name:
+        type: string
+      project_notes:
+        items:
+          $ref: '#/definitions/model.Note'
+        type: array
+      project_tasks:
+        items:
+          $ref: '#/definitions/model.Task'
+        type: array
+    type: object
+  model.Task:
+    properties:
+      project_id:
+        type: integer
+      task_date:
+        type: string
+      task_duration:
+        type: integer
+      task_id:
+        type: integer
+      task_is_complete:
+        type: boolean
+      task_name:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: <kevin.letupe@gmail.com>
+    name: Kevin L
+  description: Backend API for the Macmahome application. It permit to manage all
+    the
+  license:
+    name: Apache License
+    url: http://www.apache.org/licenses/
+  title: Macmahome application
+  version: "0.1"
+paths:
+  /note:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return all the Note entities.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Note'
+            type: array
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /note
+      tags:
+      - note
+    patch:
+      consumes:
+      - application/json
+      description: Permit to update a note entity with a JSON object. Return the updated
+        entity
+      parameters:
+      - description: Updated note entity
+        in: body
+        name: note
+        required: true
+        schema:
+          $ref: '#/definitions/model.Note'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Note'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: PATCH /note
+      tags:
+      - note
+    post:
+      consumes:
+      - application/json
+      description: Permit to create a new note entity from a JSON object. Note could
+        be linked
+      parameters:
+      - description: New note to create
+        in: body
+        name: note
+        required: true
+        schema:
+          $ref: '#/definitions/model.Note'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Note'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: POST /note
+      tags:
+      - note
+  /note/:id:
+    delete:
+      consumes:
+      - multipart/form-data
+      description: Permit to delete a note based on its id. Return the deleted entity.
+      parameters:
+      - description: Id of the note to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Note'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: DELETE /note/:id
+      tags:
+      - note
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return a Note entity based on its id.
+      parameters:
+      - description: Id of the note to return
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Note'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to return not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /note/:id
+      tags:
+      - note
+  /project:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return all the Project entities.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Project'
+            type: array
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /project
+      tags:
+      - project
+    patch:
+      consumes:
+      - application/json
+      description: Permit to update a project entity with a JSON object. Return the
+        updated entity
+      parameters:
+      - description: Updated project entity
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/model.Project'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: PATCH /project
+      tags:
+      - project
+    post:
+      consumes:
+      - application/json
+      description: Permit to create a new project entity from a JSON object. Return
+        the created entity. If
+      parameters:
+      - description: New project to create
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/model.Project'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: POST /project
+      tags:
+      - project
+  /project/:id:
+    delete:
+      consumes:
+      - multipart/form-data
+      description: Permit to delete a project based on its id. Return the deleted
+        entity.
+      parameters:
+      - description: Id of the project to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: DELETE /project/:id
+      tags:
+      - project
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return a Project entity based on its id. Return
+      parameters:
+      - description: Id of the project to return
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Project'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to return not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /project/:id
+      tags:
+      - project
+  /project/:id/note:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return all the Note entities of a project with the project
+        id.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Note'
+            type: array
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /project/:id/note
+      tags:
+      - note
+  /project/:id/task:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return all the Task entities of a project with the project
+        id.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Task'
+            type: array
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /project/:id/task
+      tags:
+      - task
+  /service-status:
+    get:
+      description: Simple route to determine if the service is up or not.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: GET /service-status
+      tags:
+      - admin
+  /task:
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return all the Task entities.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Task'
+            type: array
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /task
+      tags:
+      - task
+    patch:
+      consumes:
+      - application/json
+      description: Permit to update a task entity with a JSON object. Return the updated
+        entity
+      parameters:
+      - description: Updated task entity
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Task'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: PATCH /task
+      tags:
+      - task
+    post:
+      consumes:
+      - application/json
+      description: Permit to create a new task entity from a JSON object. Task could
+        be linked
+      parameters:
+      - description: New task to create
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/model.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Task'
+        "400":
+          description: Error with the format of the provided data.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: POST /task
+      tags:
+      - task
+  /task/:id:
+    delete:
+      consumes:
+      - multipart/form-data
+      description: Permit to delete a task based on its id. Return the deleted entity.
+      parameters:
+      - description: Id of the task to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Task'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to delete not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: DELETE /task/:id
+      tags:
+      - task
+    get:
+      consumes:
+      - multipart/form-data
+      description: Permit to return a Task entity based on its id.
+      parameters:
+      - description: Id of the task to return
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Task'
+        "400":
+          description: Error with the format of the provided id.
+          schema:
+            type: error
+        "404":
+          description: Entity to return not found error.
+          schema:
+            type: error
+        "500":
+          description: Internal error during the the request handling.
+          schema:
+            type: error
+      summary: GET /task/:id
+      tags:
+      - task
+produces:
+- application/json
+swagger: "2.0"

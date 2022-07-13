@@ -15,3 +15,5 @@
 # vendor/
 data
 sql
+
+.DS_Store

@@ -2,15 +2,24 @@ package api
 
 import "github.com/gin-gonic/gin"
 
+// serviceStatus permit to determine if the service is up or not.
+// @summary      GET /service-status
+// @description  Simple route to determine if the service is up or not.
+// @tags         admin
+// @produce      json
+// @Success      200  {object}  map[string]string
+// @Router       /service-status [get]
+func serviceStatus(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "OK",
+	})
+}
+
 func NewRouter() *gin.Engine {
 
 	router := gin.Default()
 
-	router.GET("/service-status", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message":  "OK",
-		})
-	})
+	router.GET("/service-status", serviceStatus)
 
 	router.GET("/task/:id", returnTask)
 	router.GET("/task", returnTasks)
