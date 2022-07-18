@@ -37,7 +37,6 @@ func (suite *RouteAPITests) SetupSuite() {
 	if err != nil {
 		panic("an error occured during the migration.")
 	}
-
 	suite.TestDbConn = dbConn
 	suite.TestRouter = api.NewRouter()
 	suite.TestingDate, _ = time.Parse("2006-01-02", "2022-01-01")
@@ -62,12 +61,12 @@ func (suite *RouteAPITests) SetupSuite() {
 	suite.FakeJSONTaskItem = "{\"task_id\": 12,\"task_name\": 456}"
 	suite.FakeJSONProjectItem = "{\"project_id\": 12,\"project_name\": 456}"
 
-	dbConn.Debug().Omit(clause.Associations).Create(&suite.ProjectItems[0])
-	dbConn.Debug().Omit(clause.Associations).Create(&suite.ProjectItems[1])
-	dbConn.Debug().Create(&suite.TaskItems[0])
-	dbConn.Debug().Omit("ProjectId").Create(&suite.TaskItems[1])
-	dbConn.Debug().Create(&suite.NoteItems[0])
-	dbConn.Debug().Omit("ProjectId").Create(&suite.NoteItems[1])
+	dbConn.Omit(clause.Associations).Create(&suite.ProjectItems[0])
+	dbConn.Omit(clause.Associations).Create(&suite.ProjectItems[1])
+	dbConn.Create(&suite.TaskItems[0])
+	dbConn.Omit("ProjectId").Create(&suite.TaskItems[1])
+	dbConn.Create(&suite.NoteItems[0])
+	dbConn.Omit("ProjectId").Create(&suite.NoteItems[1])
 }
 
 // after all the suite
@@ -76,7 +75,7 @@ func (suite *RouteAPITests) TearDownSuite() {
 	os.Setenv("MACMAHOME_TEST", "true")
 
 	dbConn := utils.NewDBConnection()
-	err := dbConn.Migrator().DropTable(&model.Project{}, &model.Project{}, &model.Note{})
+	err := dbConn.Migrator().DropTable(&model.Project{}, &model.Task{}, &model.Note{})
 	if err != nil {
 		panic("an error occured during the migration.")
 	}

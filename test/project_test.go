@@ -7,6 +7,7 @@ import (
 
 	"github.com/kevinl75/macmahome-backend/model"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm/clause"
 )
 
 func (suite *RouteAPITests) TestProjectPostRoute() {
@@ -77,7 +78,7 @@ func (suite *RouteAPITests) TestProjectDeleteRoute() {
 	assert.Equal(suite.T(), 200, w.Code)
 	assert.Equal(suite.T(), true, project.IsEqual(suite.ProjectItems[1]))
 	// assert.Equal(suite.T(), suite.ProjectItems[1], project)
-	suite.TestDbConn.Create(&project)
+	suite.TestDbConn.Omit(clause.Associations).Create(&project)
 
 	// We assert that trying to delete a not existing entity will return a code 404
 	w = ServeTestHTTPRequest("DELETE", "/project/4", nil, suite.TestRouter)
@@ -90,7 +91,7 @@ func (suite *RouteAPITests) TestProjectDeleteRoute() {
 	// We assert that deleted a project link to existing tasks and notes will return a code 500
 	w = ServeTestHTTPRequest("DELETE", "/project/1", nil, suite.TestRouter)
 	assert.Equal(suite.T(), 200, w.Code)
-	suite.TestDbConn.Create(&(suite.ProjectItems[0]))
+	suite.TestDbConn.Omit(clause.Associations).Create(&(suite.ProjectItems[0]))
 }
 
 func (suite *RouteAPITests) TestProjectPatchRoute() {
@@ -105,7 +106,7 @@ func (suite *RouteAPITests) TestProjectPatchRoute() {
 	assert.Equal(suite.T(), 200, w.Code)
 	assert.Equal(suite.T(), project, updatedProject)
 	assert.NotEqual(suite.T(), project.ProjectName, suite.ProjectItems[1].ProjectName)
-	suite.TestDbConn.Save(&suite.ProjectItems[1])
+	suite.TestDbConn.Updates(&suite.ProjectItems[1])
 
 	// We assert that patching a not existing entity will return a code 404
 	patchRequestData, _ = json.Marshal(suite.ProjectItems[2])
